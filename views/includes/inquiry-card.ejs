@@ -1,0 +1,75 @@
+<!-- views/includes/inquiry-card.ejs -->
+<!-- Reusable card shown in owner dashboard for each inquiry -->
+
+<div class="card border-0 shadow-sm">
+  <div class="card-body">
+    <div class="row align-items-center">
+
+      <!-- Tenant Info -->
+      <div class="col-md-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="avatar-circle">
+            <%= inq.tenant.username.charAt(0).toUpperCase() %>
+          </div>
+          <div>
+            <p class="fw-semibold mb-0"><%= inq.tenantName %></p>
+            <p class="text-muted small mb-0"><%= inq.tenant.email %></p>
+            <p class="text-muted small mb-0">
+              <i class="fa-solid fa-phone"></i> <%= inq.tenantPhone %>
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listing + Move-in -->
+      <div class="col-md-4 mt-2 mt-md-0">
+        <p class="fw-semibold mb-0"><%= inq.listing.title %></p>
+        <p class="text-muted small mb-0">
+          <i class="fa-solid fa-location-dot"></i> <%= inq.listing.city %>
+          &nbsp;|&nbsp; &#8377;<%= inq.listing.rent.toLocaleString("en-IN") %>/mo
+        </p>
+        <p class="text-muted small mb-0">
+          Move-in: <strong><%= new Date(inq.moveInDate).toDateString() %></strong>
+        </p>
+        <% if(inq.message) { %>
+          <p class="text-muted small mb-0 fst-italic">"<%= inq.message %>"</p>
+        <% } %>
+      </div>
+
+      <!-- Status + Actions -->
+      <div class="col-md-4 text-md-end mt-3 mt-md-0">
+        <% if(inq.status === "pending") { %>
+          <span class="badge bg-warning text-dark mb-2">Pending</span>
+        <% } else if(inq.status === "approved") { %>
+          <span class="badge bg-success mb-2">Approved</span>
+        <% } else if(inq.status === "paid") { %>
+          <span class="badge bg-primary mb-2">Confirmed & Paid</span>
+          <p class="text-muted small mb-0">Payment: <code><%= inq.payment.paymentId %></code></p>
+        <% } else if(inq.status === "rejected") { %>
+          <span class="badge bg-danger mb-2">Rejected</span>
+        <% } %>
+
+        <!-- Approve/Reject buttons only for pending -->
+        <% if(showActions && inq.status === "pending") { %>
+          <div class="d-flex gap-2 justify-content-md-end mt-2">
+            <form method="post" action="/inquiries/approve/<%= inq._id %>">
+              <button class="btn btn-success btn-sm">
+                <i class="fa-solid fa-check"></i> Approve
+              </button>
+            </form>
+            <form method="post" action="/inquiries/reject/<%= inq._id %>">
+              <button class="btn btn-danger btn-sm">
+                <i class="fa-solid fa-times"></i> Reject
+              </button>
+            </form>
+          </div>
+        <% } %>
+
+        <p class="text-muted small mt-1 mb-0">
+          Received: <%= new Date(inq.createdAt).toDateString() %>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<% layout('/layouts/boilerplate') -%>
+
+<div class="row">
+  <div class="col-md-5 mx-auto">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <h4 class="fw-bold mb-1 text-center">Create an Account</h4>
+        <p class="text-muted text-center small mb-4">Join NestMate — Find or List PGs</p>
+
+        <form method="post" action="/register" novalidate class="needs-validation">
+
+          <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input name="username" type="text" class="form-control" placeholder="e.g. bhagyashri123" required>
+            <div class="invalid-feedback">Username is required.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" type="email" class="form-control" placeholder="you@email.com" required>
+            <div class="invalid-feedback">Valid email is required.</div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input name="password" type="password" class="form-control" placeholder="Min 6 characters" required minlength="6">
+            <div class="invalid-feedback">Password must be at least 6 characters.</div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">I am a...</label>
+            <div class="d-flex gap-4">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="role" value="tenant" id="tenant" checked>
+                <label class="form-check-label" for="tenant">
+                  <i class="fa-solid fa-person text-primary"></i> Tenant (Looking for PG)
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="role" value="owner" id="owner">
+                <label class="form-check-label" for="owner">
+                  <i class="fa-solid fa-building text-warning"></i> Owner (Listing a PG)
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">Register</button>
+        </form>
+
+        <p class="text-center mt-3 mb-0 small">Already have an account? <a href="/login">Login</a></p>
+      </div>
+    </div>
+  </div>
+</div>

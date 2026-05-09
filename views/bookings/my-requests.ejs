@@ -1,0 +1,165 @@
+<% layout('/layouts/boilerplate') -%>
+
+<div class="row">
+  <div class="col-lg-10 offset-lg-1">
+    <h3 class="fw-bold mb-1">My Booking Requests</h3>
+    <p class="text-muted mb-4">Track all your PG inquiries and payment status here.</p>
+
+    <% if(inquiries.length === 0) { %>
+      <div class="text-center py-5">
+        <i class="fa-solid fa-clipboard-list fa-3x text-muted mb-3"></i>
+        <h5>No inquiries yet</h5>
+        <p class="text-muted">Browse PGs and send an inquiry to get started.</p>
+        <a href="/listings" class="btn btn-primary">Browse PGs</a>
+      </div>
+    <% } else { %>
+      <div class="row g-3">
+        <% for(let inq of inquiries) { %>
+          <div class="col-12">
+            <div class="card request-card border-0 shadow-sm">
+              <div class="card-body">
+                <div class="row align-items-center">
+
+                  <!-- PG Image -->
+                  <div class="col-md-2 mb-2 mb-md-0">
+                    <img src="<%= inq.listing.image %>" class="img-fluid rounded-2" style="height:80px;object-fit:cover;width:100%;" alt="PG">
+                  </div>
+
+                  <!-- Details -->
+                  <div class="col-md-6">
+                    <h6 class="fw-bold mb-1"><%= inq.listing.title %></h6>
+                    <p class="text-muted small mb-1">
+                      <i class="fa-solid fa-location-dot"></i>
+                      <%= inq.listing.city %> &nbsp;|&nbsp;
+                      &#8377;<%= inq.listing.rent.toLocaleString("en-IN") %>/month
+                    </p>
+                    <p class="text-muted small mb-1">
+                      Move-in: <strong><%= new Date(inq.moveInDate).toDateString() %></strong>
+                    </p>
+                    <p class="text-muted small mb-0">
+                      Sent on: <%= new Date(inq.createdAt).toDateString() %>
+                    </p>
+                  </div>
+
+                  <!-- Status + Action -->
+                  <div class="col-md-4 text-md-end mt-3 mt-md-0">
+
+                    <% if(inq.status === "pending") { %>
+                      <span class="badge bg-warning text-dark fs-6 mb-2">
+                        <i class="fa-solid fa-clock"></i> Pending Review
+                      </span>
+                      <p class="text-muted small mb-0">Waiting for owner to approve</p>
+
+                    <% } else if(inq.status === "rejected") { %>
+                      <span class="badge bg-danger fs-6 mb-2">
+                        <i class="fa-solid fa-times-circle"></i> Rejected
+                      </span>
+                      <p class="text-muted small mb-0">Owner did not approve this request</p>
+
+                    <% } else if(inq.status === "approved") { %>
+                      <span class="badge bg-success fs-6 mb-2">
+                        <i class="fa-solid fa-check-circle"></i> Approved!
+                      </span>
+                      <p class="text-muted small mb-2">Pay Rs.500 token to confirm booking</p>
+
+                      <!-- Razorpay Pay Button -->
+                      <button class="btn btn-primary btn-sm pay-btn"
+                        data-inquiry-id="<%= inq._id %>">
+                        <i class="fa-solid fa-credit-card me-1"></i>Pay Rs.500 & Confirm
+                      </button>
+
+                    <% } else if(inq.status === "paid") { %>
+                      <span class="badge bg-primary fs-6 mb-2">
+                        <i class="fa-solid fa-circle-check"></i> Booking Confirmed!
+                      </span>
+                      <p class="text-muted small mb-1">Payment ID: <code><%= inq.payment.paymentId %></code></p>
+
+                      <!-- Show owner contact after payment -->
+                      <div class="alert alert-success py-2 px-3 mt-2 mb-0 text-start">
+                        <strong><i class="fa-solid fa-phone"></i> Owner Contact:</strong><br>
+                        <span><%= inq.owner.email %></span>
+                      </div>
+                    <% } %>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Razorpay Script -->
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+// When tenant clicks "Pay Rs.500 & Confirm"
+document.querySelectorAll(".pay-btn").forEach(btn => {
+  btn.addEventListener("click", async function() {
+    const inquiryId = this.dataset.inquiryId;
+    this.disabled = true;
+    this.textContent = "Creating order...";
+
+    try {
+      // Step 1: Call our server to create a Razorpay order
+      const res = await fetch(`/inquiries/payment/create-order/${inquiryId}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+      });
+      const data = await res.json();
+
+      if (data.error) {
+        alert("Error: " + data.error);
+        this.disabled = false;
+        return;
+      }
+
+      // Step 2: Open Razorpay payment popup with the order details
+      const options = {
+        key:         data.keyId,           // Razorpay Key ID
+        amount:      data.amount,          // in paise
+        currency:    data.currency,
+        name:        "NestMate",
+        description: "PG Booking Token Amount",
+        order_id:    data.orderId,         // from server
+        prefill:     data.prefill,         // pre-fill name & email
+        theme: { color: "#2563EB" },
+
+        // Step 3: Called when payment is successful
+        handler: async function(response) {
+          // Send payment details to our server for verification
+          const verifyRes = await fetch("/inquiries/payment/verify", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id:   response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature:  response.razorpay_signature,
+              inquiryId:           data.inquiryId,
+            }),
+          });
+          // After verify, the server redirects — we reload to follow redirect
+          window.location.href = "/bookings/my-requests";
+        },
+
+        modal: {
+          ondismiss: () => {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-credit-card me-1"></i>Pay Rs.500 & Confirm';
+          }
+        }
+      };
+
+      const rzp = new Razorpay(options);
+      rzp.open();   // opens the Razorpay payment popup
+
+    } catch(err) {
+      console.error(err);
+      alert("Something went wrong. Please try again.");
+      this.disabled = false;
+    }
+  });
+});
+</script>
