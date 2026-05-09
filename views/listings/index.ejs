@@ -1,0 +1,78 @@
+<% layout('/layouts/boilerplate') -%>
+
+<!-- Hero / Filter Section -->
+<div class="search-bar-wrap mb-4">
+  <h2 class="fw-bold mb-3">Find PGs &amp; Rooms Across India</h2>
+  <form method="get" action="/listings" class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <input name="city" class="form-control" placeholder="🔍 City (e.g. Pune)" value="<%= filters.city || '' %>">
+    </div>
+    <div class="col-md-2">
+      <select name="pgType" class="form-select">
+        <option value="All">All Types</option>
+        <option value="Boys"  <%= filters.pgType === 'Boys'  ? 'selected' : '' %>>Boys</option>
+        <option value="Girls" <%= filters.pgType === 'Girls' ? 'selected' : '' %>>Girls</option>
+        <option value="Co-ed" <%= filters.pgType === 'Co-ed' ? 'selected' : '' %>>Co-ed</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="roomType" class="form-select">
+        <option value="All">Any Room</option>
+        <option value="Single" <%= filters.roomType === 'Single' ? 'selected' : '' %>>Single</option>
+        <option value="Double" <%= filters.roomType === 'Double' ? 'selected' : '' %>>Double</option>
+        <option value="Triple" <%= filters.roomType === 'Triple' ? 'selected' : '' %>>Triple</option>
+      </select>
+    </div>
+    <div class="col-md-2">
+      <input name="minRent" type="number" class="form-control" placeholder="Min ₹" value="<%= filters.minRent || '' %>">
+    </div>
+    <div class="col-md-2">
+      <input name="maxRent" type="number" class="form-control" placeholder="Max ₹" value="<%= filters.maxRent || '' %>">
+    </div>
+    <div class="col-md-1">
+      <button type="submit" class="btn btn-primary w-100">Go</button>
+    </div>
+  </form>
+</div>
+
+<!-- Results Count -->
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <p class="text-muted mb-0"><%= allListings.length %> PG<%= allListings.length !== 1 ? 's' : '' %> found</p>
+  <% if(currentUser && currentUser.role === 'owner') { %>
+    <a href="/listings/new" class="btn btn-primary btn-sm">+ Add Your PG</a>
+  <% } %>
+</div>
+
+<!-- Listings Grid -->
+<% if(allListings.length === 0) { %>
+  <div class="text-center py-5">
+    <i class="fa-solid fa-magnifying-glass fa-3x text-muted mb-3"></i>
+    <h5>No PGs found matching your search.</h5>
+    <a href="/listings" class="btn btn-outline-primary mt-2">Clear Filters</a>
+  </div>
+<% } else { %>
+  <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
+    <% for(let listing of allListings) { %>
+      <div class="col">
+        <a href="/listings/<%= listing._id %>" class="text-decoration-none text-dark">
+          <div class="card listing-card h-100">
+            <img src="<%= listing.image %>" class="card-img-top listing-img" alt="PG Image">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-start mb-1">
+                <h6 class="fw-semibold mb-0"><%= listing.title %></h6>
+                <span class="badge-pgtype badge-<%= listing.pgType.toLowerCase().replace('-','') %>"><%= listing.pgType %></span>
+              </div>
+              <p class="text-muted small mb-2">
+                <i class="fa-solid fa-location-dot"></i> <%= listing.locality %>, <%= listing.city %>
+              </p>
+              <div class="d-flex justify-content-between align-items-center">
+                <span class="fw-bold text-primary">&#8377;<%= listing.rent.toLocaleString("en-IN") %><span class="text-muted fw-normal small">/month</span></span>
+                <span class="text-muted small"><i class="fa-solid fa-bed"></i> <%= listing.roomType %></span>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+    <% } %>
+  </div>
+<% } %>

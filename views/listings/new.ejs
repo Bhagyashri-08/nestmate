@@ -1,0 +1,89 @@
+<% layout('/layouts/boilerplate') -%>
+
+<div class="row">
+  <div class="col-lg-8 offset-lg-2">
+    <h3 class="fw-bold mb-4">List Your PG</h3>
+
+    <form method="post" action="/listings" novalidate class="needs-validation">
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">PG Title *</label>
+          <input name="listing[title]" type="text" class="form-control" placeholder="e.g. Shree Sai PG for Girls" required>
+          <div class="invalid-feedback">Title is required.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Description *</label>
+          <textarea name="listing[description]" class="form-control" rows="3" placeholder="Describe your PG — amenities, rules, nearby landmarks..." required></textarea>
+          <div class="invalid-feedback">Description is required.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">City *</label>
+          <input name="listing[city]" type="text" class="form-control" placeholder="e.g. Pune" required>
+          <div class="invalid-feedback">City is required.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Locality / Area *</label>
+          <input name="listing[locality]" type="text" class="form-control" placeholder="e.g. Kothrud" required>
+          <div class="invalid-feedback">Locality is required.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Monthly Rent (₹) *</label>
+          <input name="listing[rent]" type="number" class="form-control" placeholder="e.g. 7500" min="0" required>
+          <div class="invalid-feedback">Rent is required.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">PG Type *</label>
+          <select name="listing[pgType]" class="form-select" required>
+            <option value="">Select type</option>
+            <option>Boys</option>
+            <option>Girls</option>
+            <option>Co-ed</option>
+          </select>
+          <div class="invalid-feedback">Please select PG type.</div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Room Type *</label>
+          <select name="listing[roomType]" class="form-select" required>
+            <option value="">Select room type</option>
+            <option>Single</option>
+            <option>Double</option>
+            <option>Triple</option>
+          </select>
+          <div class="invalid-feedback">Please select room type.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Amenities</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% ["WiFi", "AC", "Food", "Laundry", "Gym", "CCTV", "Power Backup", "Parking"].forEach(a => { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="listing[amenities]" value="<%= a %>" id="<%= a %>">
+                <label class="form-check-label" for="<%= a %>"><%= a %></label>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Image URL</label>
+          <input name="listing[image]" type="url" class="form-control" placeholder="https://images.unsplash.com/...">
+          <div class="form-text">Leave blank to use a default image.</div>
+        </div>
+
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn btn-primary px-4">Post Listing</button>
+          <a href="/listings" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </div>
+
+      </div>
+    </form>
+    <br>
+  </div>
+</div>

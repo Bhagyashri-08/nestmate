@@ -1,0 +1,35 @@
+<nav class="navbar navbar-expand-md sticky-top">
+  <div class="container-fluid px-4">
+    <a class="navbar-brand" href="/listings">
+      <i class="fa-solid fa-house-chimney-window brand-icon"></i> NestMate
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMain">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMain">
+      <div class="navbar-nav ms-auto align-items-center gap-1">
+        <a class="nav-link" href="/listings">All PGs</a>
+
+        <% if(currentUser) { %>
+          <% if(currentUser.role === "owner") { %>
+            <a class="nav-link" href="/listings/new">+ List PG</a>
+            <a class="nav-link" href="/dashboard">
+              <i class="fa-solid fa-chart-bar"></i> Dashboard
+            </a>
+          <% } else { %>
+            <a class="nav-link" href="/bookings/my-requests">
+              <i class="fa-solid fa-clipboard-list"></i> My Requests
+            </a>
+          <% } %>
+          <span class="nav-link text-muted small">Hi, <%= currentUser.username %></span>
+          <form method="post" action="/logout" class="d-inline">
+            <button class="btn btn-outline-primary btn-sm ms-1">Logout</button>
+          </form>
+        <% } else { %>
+          <a class="nav-link" href="/login">Login</a>
+          <a class="btn btn-primary btn-sm ms-1" href="/register">Sign Up</a>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</nav>

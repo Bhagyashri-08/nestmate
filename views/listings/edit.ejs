@@ -1,0 +1,82 @@
+<% layout('/layouts/boilerplate') -%>
+
+<div class="row">
+  <div class="col-lg-8 offset-lg-2">
+    <h3 class="fw-bold mb-4">Edit Listing</h3>
+
+    <form method="post" action="/listings/<%= listing._id %>?_method=PUT" novalidate class="needs-validation">
+      <div class="row g-3">
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">PG Title *</label>
+          <input name="listing[title]" type="text" class="form-control" value="<%= listing.title %>" required>
+          <div class="invalid-feedback">Title is required.</div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Description *</label>
+          <textarea name="listing[description]" class="form-control" rows="3" required><%= listing.description %></textarea>
+          <div class="invalid-feedback">Description is required.</div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">City *</label>
+          <input name="listing[city]" type="text" class="form-control" value="<%= listing.city %>" required>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label fw-semibold">Locality *</label>
+          <input name="listing[locality]" type="text" class="form-control" value="<%= listing.locality %>" required>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Monthly Rent (₹) *</label>
+          <input name="listing[rent]" type="number" class="form-control" value="<%= listing.rent %>" min="0" required>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">PG Type *</label>
+          <select name="listing[pgType]" class="form-select" required>
+            <% ["Boys","Girls","Co-ed"].forEach(t => { %>
+              <option value="<%= t %>" <%= listing.pgType === t ? 'selected' : '' %>><%= t %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label fw-semibold">Room Type *</label>
+          <select name="listing[roomType]" class="form-select" required>
+            <% ["Single","Double","Triple"].forEach(t => { %>
+              <option value="<%= t %>" <%= listing.roomType === t ? 'selected' : '' %>><%= t %></option>
+            <% }) %>
+          </select>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Amenities</label>
+          <div class="d-flex flex-wrap gap-3">
+            <% ["WiFi","AC","Food","Laundry","Gym","CCTV","Power Backup","Parking"].forEach(a => { %>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" name="listing[amenities]" value="<%= a %>"
+                  id="edit_<%= a %>" <%= listing.amenities.includes(a) ? 'checked' : '' %>>
+                <label class="form-check-label" for="edit_<%= a %>"><%= a %></label>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+
+        <div class="col-12">
+          <label class="form-label fw-semibold">Image URL</label>
+          <input name="listing[image]" type="url" class="form-control" value="<%= listing.image %>">
+        </div>
+
+        <div class="col-12 mt-2">
+          <button type="submit" class="btn btn-warning px-4">Update Listing</button>
+          <a href="/listings/<%= listing._id %>" class="btn btn-outline-secondary ms-2">Cancel</a>
+        </div>
+
+      </div>
+    </form>
+    <br>
+  </div>
+</div>
